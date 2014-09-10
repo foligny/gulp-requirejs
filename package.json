@@ -1,0 +1,38 @@
+{
+  "name": "gulp-requirejs",
+  "version": "0.1.0",
+  "description": "Parallel migration from grunt-contrib-requirejs to gulp-requirejs ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bornkiller/gulp-requirejs.git"
+  },
+  "keywords": [
+    "gulp",
+    "gulp-requirejs",
+    "requirejs"
+  ],
+  "dependencies": {
+    "gulp-util": "^2.2.5",
+    "through2": "^0.6.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.7",
+    "gulp-jshint": "^1.8.4",
+    "gulp-sourcemaps": "^1.1.4",
+    "istanbul": "^0.3.2",
+    "jshint-stylish": "^0.4.0",
+    "mocha": "^1.21.4",
+    "mocha-lcov-reporter": "0.0.1",
+    "should": "^4.0.4"
+  },
+  "author": "bornkiller <hjj491229492@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bornkiller/gulp-requirejs/issues"
+  },
+  "homepage": "https://github.com/bornkiller/gulp-requirejs"
+}

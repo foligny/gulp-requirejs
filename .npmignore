@@ -1,0 +1,8 @@
+.DG_Store
+*.log
+docs
+benchmarks
+examples
+test
+Makefile
+coverage
