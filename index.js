@@ -9,7 +9,6 @@ module.exports = function(opts) {
   if (!opts) {
   	throw new PluginError(PLUGIN_NAME, 'Missing options for gulp-requirejs-optimizer');
   }
-
   var moduleStorage = {};
 
   function transformBuffer(file) {

@@ -1,22 +1,3 @@
-gulp-requirejs
-==============
-
-Parallel migration from grunt-contrib-requirejs to gulp-requirejs
-
-#Warning
-The project start from 2014/09/10, and far away from production environment.
-welcome any pull request, I promise to lookup any modification, or just become collaborator throught 
-send me an email hjj491229492@hotmail.com.
-
-## Schedule
-+ make unit test ready before 2014/09/14.
-+ provide an extremely simplify r.js for cool optimize invoke during 2014/09/14----2014/09/24.
-+ first release version before 2014/09/31.
-+ regular maintain and version upgrade after the chinese National Day. 
-
-## Parse module 
-parse module should get useful information and preprocess the modules during transformFunction.
-```javascript
 module.exports = {
     /**
      * @description
@@ -49,4 +30,3 @@ module.exports = {
         return fileContents;
     }
 };
-```
