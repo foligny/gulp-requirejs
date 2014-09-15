@@ -1,1 +1,1 @@
-define(['lang','logger'],function(lang,logger){console.log(lang,logger);});
+define(['lang','logger'],function(lang,logger){});
