@@ -14,7 +14,7 @@
     "optimizer"
   ],
   "dependencies": {
-    "gulp-util": "^2.2.5",
+    "gulp-util": "^2.2.20",
     "merge": "^1.2.0",
     "through-gulp": "^0.1.6"
   },
