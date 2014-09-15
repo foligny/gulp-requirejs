@@ -14,7 +14,7 @@
     "optimizer"
   ],
   "dependencies": {
-    "gulp-util": "^2.2.20",
+    "gulp-util": "^3.0.1",
     "merge": "^1.2.0",
     "through-gulp": "^0.2.0"
   },
@@ -23,6 +23,7 @@
     "gulp-jshint": "^1.8.4",
     "gulp-mocha": "^1.1.0",
     "jshint-stylish": "^0.4.0",
+    "istanbul": "^0.3.2",
     "mocha": "^1.21.4",
     "should": "^4.0.4",
     "stream-assert-gulp": "^0.3.0"
