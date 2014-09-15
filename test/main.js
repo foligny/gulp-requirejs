@@ -7,15 +7,17 @@ require('should');
 
 describe('gulp-requirejs-errors', function () {
     it('should throw when options is missing', function () {
-        (gulp.src(['./test/fixtures/lang.js']).pipe(gulpRequirejs()))
-            .should.throw('Missing options for gulp-requirejs-optimizer');
+        (function() {
+            gulp.src(['./test/fixtures/lang.js']).pipe(gulpRequirejs());
+        })
+        .should.throw('Missing options for gulp-requirejs-optimizer');
     });
 
     it('should emit error when streamed file', function (done) {
-        gulp.src(['.test/fixtures/lang.js'], {buffer: false})
+        gulp.src(['./test/fixtures/lang.js'], {buffer: false})
             .pipe(gulpRequirejs({}))
             .on('error', function(err) {
-                err.message.should.eql('stream not supported');
+                err.message.should.eql('Stream not supported');
                 done();
             });
     });

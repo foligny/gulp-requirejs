@@ -13,11 +13,12 @@ module.exports = function(opts) {
 
   function transformBuffer(file) {
   	  if (file.isNull()) {
-
+          this.push(file);
   	  }
 
   	  if (file.isStream()) {
-
+          this.emit('error', new PluginError(PLUGIN_NAME, 'Stream not supported'));
+          this.push(file);
   	  }
 
       if (file.isBuffer()) {
