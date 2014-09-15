@@ -12,6 +12,17 @@ module.exports = {
     /**
      * @description
      * To get proper module dependencies name.
+     * @param {string} fileContents  the original file content to set explicit module name
+     * @param {string} name  the proper name the module should be
+     * @returns {string}  resolved file contents with module name, and ready for concat
+     */
+    setModuleName: function(fileContents, name) {
+        return fileContents;
+    },
+
+    /**
+     * @description
+     * To get proper module dependencies name.
      * @param {string} fileContents  the original file content to analyze to get module dependencies name
      * @returns {array} the module dependencies name from file contents, empty when undeclared
      */
@@ -21,12 +32,12 @@ module.exports = {
 
     /**
      * @description
-     * To get proper module dependencies name.
-     * @param {string} fileContents  the original file content to set explicit module name
-     * @param {string} name  the proper name the module should be
-     * @returns {string}  resolved file contents with module name, and ready for concat
+     * To push proper module dependencies name.
+     * @param {string} fileContents  the original file content to analyze to get module dependencies name
+     * @param {array} modules the module dependency to add, normally used for recursive.
+     * @returns {array} the module dependencies name from file contents, empty when undeclared
      */
-	setModuleName: function(fileContents, name) {
-        return fileContents;
+    pushModuleDependencies: function(fileContents, modules) {
+        return true;
     }
 };

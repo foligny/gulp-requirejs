@@ -10,15 +10,17 @@
 	"plusplus": true,
 	"undef": true,
 	"unused": true,
-	"strict": true,
+	"strict": false,
 	"boss": false,
 	"eqnull": true,
+    "expr": false,
 	"node": true,
     "globals": {
       "define": true,
       "require": true,
       "describe": true,
       "beforeEach": true,
-      "afterEach": true
+      "afterEach": true,
+      "it": true
     }
 }

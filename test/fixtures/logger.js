@@ -1,1 +1,1 @@
-define([],function(){return 'logger module';});
+define([],function(){});

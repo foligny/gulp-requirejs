@@ -1,10 +1,10 @@
 {
   "name": "gulp-requirejs-optimizer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Parallel migration from grunt-contrib-requirejs to gulp-requirejs ",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/main.js"
+    "test": "gulp test"
   },
   "repository": "https://github.com/bornkiller/gulp-requirejs.git",
   "keywords": [
@@ -15,17 +15,16 @@
   "dependencies": {
     "gulp-util": "^2.2.5",
     "merge": "^1.2.0",
-    "through": "^2.3.4"
+    "through-gulp": "^0.1.6"
   },
   "devDependencies": {
     "gulp": "^3.8.7",
     "gulp-jshint": "^1.8.4",
-    "istanbul": "^0.3.2",
+    "gulp-mocha": "^1.1.0",
     "jshint-stylish": "^0.4.0",
     "mocha": "^1.21.4",
-    "mocha-lcov-reporter": "0.0.1",
     "should": "^4.0.4",
-    "stream-assert": "^1.0.1",
+    "stream-assert-gulp": "^0.2.0"
   },
   "author": "bornkiller <hjj491229492@hotmail.com>",
   "license": "MIT",

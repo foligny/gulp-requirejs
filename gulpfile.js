@@ -1,27 +1,20 @@
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
+var mocha = require('gulp-mocha');
 var gulpRequirejs = require('./index.js');
-
-gulp.task('manual', function(){
-	return gulp.src([
-		'modules/**/*.js'
-	])
-	.pipe(gulpRequirejs({}))
-    .pipe(gulp.dest('dist'))
-});
 
 gulp.task('jshint', function() {
 	return gulp.src([
-		'*.js',
-		'!gulpfile.js',
-		'test/**/*.js',
-		'!test/fixtures/**/*.js'
+		'index.js',
+		'src/*.js',
+		'test/main.js'
 	])
 	.pipe(jshint())
 	.pipe(jshint.reporter(stylish))
 });
 
 gulp.task('test', ['jshint'], function() {
-	return true;
+    return gulp.src('test/main.js', {read: false})
+        .pipe(mocha());
 });

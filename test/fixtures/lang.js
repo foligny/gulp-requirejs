@@ -1,1 +1,1 @@
-define([],function(){return 'language module';});
+define([],function(){});
