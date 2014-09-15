@@ -1,6 +1,7 @@
 gulp-requirejs
 ==============
 ![Build Status](https://img.shields.io/travis/bornkiller/gulp-requirejs/master.svg?style=flat)
+![Coverage Report](http://img.shields.io/coveralls/bornkiller/gulp-requirejs.svg?style=flat)
 ![Package Dependency](https://david-dm.org/bornkiller/gulp-requirejs.svg?style=flat)
 ![Package DevDependency](https://david-dm.org/bornkiller/gulp-requirejs/dev-status.svg?style=flat)
 

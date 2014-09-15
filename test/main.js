@@ -5,7 +5,7 @@ var gulpRequirejs = require('../index.js');
 require('mocha');
 require('should');
 
-describe.skip('gulp-requirejs-errors', function () {
+describe('gulp-requirejs-errors', function () {
     it('should throw when options is missing', function () {
         (function() {
             gulp.src(['./test/fixtures/lang.js']).pipe(gulpRequirejs());
@@ -38,7 +38,7 @@ describe.skip('gulp-requirejs-errors', function () {
     });
 });
 
-describe.skip('gulp-requirejs-optimize', function () {
+describe('gulp-requirejs-optimize', function () {
     it('should match the template file', function(done) {
         gulp.src('./test/fixtures/*.js')
             .pipe(gulpRequirejs({

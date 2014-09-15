@@ -31,14 +31,13 @@ module.exports = {
                 result = fileContents;
             }
 
-            if (Object.prototype.toString.call(name) === '[object Array]'
-                && typeof dependencies === 'function') {
+            if (Object.prototype.toString.call(name) === '[object Array]' && typeof dependencies === 'function') {
                 result = "define('" + moduleName.toString() + "',[";
                 name.forEach(function(value, key) {
                     if (key !== name.length-1) {
-                        result += "'" + value.toString() + "',"
+                        result += "'" + value.toString() + "',";
                     } else {
-                        result += "'" + value.toString() + "'"
+                        result += "'" + value.toString() + "'";
                     }
                 });
                 result +=  "]," + dependencies.toString() + ")";
@@ -84,15 +83,12 @@ module.exports = {
             var result = null;
             var deps = null;
             var implement = null;
-            if (typeof name === 'string'
-                && Object.prototype.toString.call(name) === '[object Array]'
-                && typeof structure === 'function') {
+            if (typeof name === 'string' && Object.prototype.toString.call(name) === '[object Array]' && typeof structure === 'function') {
                 deps = dependencies.concat(moduleNames);
                 implement = structure;
             }
 
-            if (Object.prototype.toString.call(name) === '[object Array]'
-                && typeof dependencies === 'function') {
+            if (Object.prototype.toString.call(name) === '[object Array]' && typeof dependencies === 'function') {
                 deps = name.concat(moduleNames);
                 implement = dependencies;
             }
@@ -105,9 +101,9 @@ module.exports = {
             result = "define([";
             deps.forEach(function(value, key) {
                 if (key !== deps.length-1) {
-                    result += "'" + value.toString() + "',"
+                    result += "'" + value.toString() + "',";
                 } else {
-                    result += "'" + value.toString() + "'"
+                    result += "'" + value.toString() + "'";
                 }
             });
             result +=  "]," + implement.toString() + ")";
