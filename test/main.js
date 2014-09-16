@@ -1,6 +1,9 @@
 var gulp = require('gulp');
 var assert = require('stream-assert-gulp');
 var parse = require('../src/parse.js');
+var through = require('through-gulp');
+var normalizer = require('../src/normalize-path.js');
+var path = require('path');
 var gulpRequirejs = require('../index.js');
 require('mocha');
 require('should');
@@ -100,4 +103,36 @@ describe('parse module', function () {
         result.should.equal("define(['lang','logger'],function(){})");
     });
 
+    describe('normalize-path module', function () {
+        it('should get proper file relative path', function () {
+
+        });
+    });
+});
+
+describe('normalize path module', function () {
+    it('should normalize file path', function (done) {
+        gulp.src(['./test/fixtures/lang.js'])
+            .pipe(through(function(file, encoding, callback) {
+                var basePath = './test';
+                var fullBasePath = path.resolve(file.cwd, basePath);
+                var relativePath = normalizer.normalizeFileRelative(fullBasePath, file.path);
+                relativePath.should.equal(path.join('fixtures', 'lang'));
+                callback();
+                done();
+            }))
+    });
+
+    it('should normalize dependent path', function (done) {
+        gulp.src(['./test/fixtures/lang.js'])
+            .pipe(through(function(file, encoding, callback) {
+                var basePath = './test';
+                var fullBasePath = path.resolve(file.cwd, basePath);
+                var fileRelativePath = normalizer.normalizeFileRelative(fullBasePath, file.path);
+                var dependentRelativePath = normalizer.normalizeDependentRelative(fullBasePath, './fixtures/lang');
+                fileRelativePath.should.equal(dependentRelativePath);
+                callback();
+                done();
+            }))
+    });
 });
