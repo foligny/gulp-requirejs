@@ -27,11 +27,10 @@ module.exports = {
     setModuleName: function(fileContents, moduleName) {
         var define = function(name, dependencies) {
             var result = null;
+            var tmp = null;
             if (typeof name === 'string') {
                 result = fileContents;
-            }
-
-            if (Object.prototype.toString.call(name) === '[object Array]' && typeof dependencies === 'function') {
+            } else if (Object.prototype.toString.call(name) === '[object Array]') {
                 result = "define('" + moduleName.toString() + "',[";
                 name.forEach(function(value, key) {
                     if (key !== name.length-1) {
@@ -40,14 +39,14 @@ module.exports = {
                         result += "'" + value.toString() + "'";
                     }
                 });
-                result +=  "]," + dependencies.toString() + ")";
+                tmp = typeof dependencies !== 'undefined' ? dependencies.toString() : '';
+                result +=  "]," + tmp + ")";
             } else {
                 result = "define('" + moduleName.toString() + "'," + name.toString() + ")";
             }
 
             return result;
         };
-
         return eval(fileContents);
     },
 
@@ -63,7 +62,7 @@ module.exports = {
                 return dependencies;
             } else if (Object.prototype.toString.call(name) === '[object Array]') {
                 return name;
-            } else if (typeof name === 'function') {
+            } else {
                 return [];
             }
         };
@@ -83,22 +82,21 @@ module.exports = {
             var result = null;
             var deps = null;
             var implement = null;
-            if (typeof name === 'string' && Object.prototype.toString.call(name) === '[object Array]' && typeof structure === 'function') {
+            if (typeof name === 'string' && Object.prototype.toString.call(dependencies) === '[object Array]') {
+                result = "define('" + name.toString() + "',[" ;
+                console.log(name);
                 deps = dependencies.concat(moduleNames);
-                implement = structure;
-            }
-
-            if (Object.prototype.toString.call(name) === '[object Array]' && typeof dependencies === 'function') {
+                implement = typeof structure !== 'undefined'? structure : '';
+            } else if (Object.prototype.toString.call(name) === '[object Array]') {
+                result = "define([";
                 deps = name.concat(moduleNames);
                 implement = dependencies;
-            }
-
-            if (typeof  name === 'function') {
+            } else {
+                result = "define([";
                 deps = moduleNames;
                 implement = name;
             }
 
-            result = "define([";
             deps.forEach(function(value, key) {
                 if (key !== deps.length-1) {
                     result += "'" + value.toString() + "',";

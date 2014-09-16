@@ -42,7 +42,7 @@ describe('gulp-requirejs-errors', function () {
 });
 
 describe('gulp-requirejs-optimize', function () {
-    it('should match the basic template file', function(done) {
+    it('should optimize single file without sub-directory', function(done) {
         gulp.src('./test/fixtures/*.js')
             .pipe(gulpRequirejs({
                 baseUrl: './test/fixtures',
@@ -55,13 +55,30 @@ describe('gulp-requirejs-optimize', function () {
             .on('end', done);
     });
 
-    it('should match the sub template file', function(done) {
+    it('should optimize single file without sub-directory', function(done) {
         gulp.src('./test/fixtures/**/*.js')
             .pipe(gulpRequirejs({
                 baseUrl: './test/fixtures',
                 module: 'optimize-sub'
             }))
             .pipe(assert.first(function(file){
+                var compare = "define('lang',[],function(){});define('subFixtures/html',[],function(){});define('optimize-sub',['lang','subFixtures/html'],function(lang,html){});";
+                (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
+            }))
+            .on('end', done);
+    });
+
+    it('should optimize multiple file', function(done) {
+        gulp.src('./test/fixtures/**/*.js')
+            .pipe(gulpRequirejs({
+                baseUrl: './test/fixtures',
+                module: ['optimize-info','optimize-sub']
+            }))
+            .pipe(assert.first(function(file){
+                var compare = "define('lang',[],function(){});define('logger',[],function(){});define('optimize-info',['lang','logger'],function(lang,logger){});";
+                (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
+            }))
+            .pipe(assert.last(function(file){
                 var compare = "define('lang',[],function(){});define('subFixtures/html',[],function(){});define('optimize-sub',['lang','subFixtures/html'],function(lang,html){});";
                 (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
             }))
@@ -90,14 +107,32 @@ describe('parse module', function () {
         result.should.equal('example');
     });
 
+    it('should not set proper module name when already have name', function () {
+        sample = "define('sample',['lang','logger'],function(lang,logger){})";
+        result = parse.setModuleName(sample, 'example').replace(/\s*/g, "");
+        result.should.equal("define('sample',['lang','logger'],function(lang,logger){})");
+    });
+
     it('should set proper module name when pass-in', function () {
         sample = "define(['lang','logger'],function(lang,logger){})";
         result = parse.setModuleName(sample, 'example').replace(/\s*/g, "");
         result.should.equal("define('example',['lang','logger'],function(lang,logger){})");
     });
 
+    it('should set proper module name when pass-in', function () {
+        sample = "define(function(lang,logger){})";
+        result = parse.setModuleName(sample, 'example').replace(/\s*/g, "");
+        result.should.equal("define('example',function(lang,logger){})");
+    });
+
     it('should get empty module dependencies when undeclared', function () {
         sample = "define([], function(){return {};})";
+        result = parse.getModuleDependencies(sample);
+        result.should.be.empty;
+    });
+
+    it('should get empty module dependencies when missing', function () {
+        sample = "define(function(){return {};})";
         result = parse.getModuleDependencies(sample);
         result.should.be.empty;
     });
@@ -108,8 +143,20 @@ describe('parse module', function () {
         result.should.eql(['lang', 'logger']);
     });
 
-    it('should push proper module dependencies when pass-in', function () {
+    it('should push proper module dependencies when pass-in with module name', function () {
+        sample = "define('sample',[],function(){})";
+        result = parse.pushModuleDependencies(sample, ['lang', 'logger']).replace(/\s*/g, "");
+        result.should.equal("define('sample',['lang','logger'],function(){})");
+    });
+
+    it('should push proper module dependencies when pass-in without module name', function () {
         sample = "define([],function(){})";
+        result = parse.pushModuleDependencies(sample, ['lang', 'logger']).replace(/\s*/g, "");
+        result.should.equal("define(['lang','logger'],function(){})");
+    });
+
+    it('should push proper module dependencies when pass-in without module dependency', function () {
+        sample = "define(function(){})";
         result = parse.pushModuleDependencies(sample, ['lang', 'logger']).replace(/\s*/g, "");
         result.should.equal("define(['lang','logger'],function(){})");
     });

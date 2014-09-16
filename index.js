@@ -37,7 +37,23 @@ module.exports = function(opts) {
   }
 
   function flushBuffer(callback) {
-      var targetModule = normalizer.normalizeDependentRelative(fullBasePath, opts.module);
+      var file;
+      var optimizedArray = [];
+      var self = this;
+      optimizedArray = optimizedArray.concat(opts.module);
+      optimizedArray.forEach(function(value) {
+          file = optimize(value);
+          if (!file) {
+              self.emit('error', new PluginError(PLUGIN_NAME, 'Missing required module'));
+          } else {
+              self.push(file);
+          }
+      });
+      callback();
+  }
+
+  function optimize(moduleName) {
+      var targetModule = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
       var targetFile = moduleStorage[targetModule];
       var originalDependencies = parse.getModuleDependencies(targetFile.contents.toString());
       var dependentContents;
@@ -45,22 +61,18 @@ module.exports = function(opts) {
           return !moduleStorage[value];
       });
       if (missingModule) {
-          this.emit('error', new PluginError(PLUGIN_NAME, 'Missing required module'));
-          callback();
+          return false;
       } else {
           dependentContents = originalDependencies.map(function(value) {
               return moduleStorage[value].contents.toString() + ';';
           });
           dependentContents.push(targetFile.contents.toString() + ';');
-          var file = new File({
+          return new File({
               path: targetModule + '.js',
               contents: new Buffer(dependentContents.join('\n'))
           });
-          this.push(file);
-          callback();
       }
   }
-
   return through(transformBuffer, flushBuffer);
 };
 

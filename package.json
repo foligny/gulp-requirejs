@@ -1,6 +1,6 @@
 {
   "name": "gulp-requirejs-optimizer",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "personal achieve project for requirejs optimize --- gulp-requirejs ",
   "main": "index.js",
   "scripts": {

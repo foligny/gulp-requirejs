@@ -14,30 +14,36 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 + Expected first release version before 2014/09/31.
 + Regular maintain and version upgrade after the chinese National Day. 
 
-# Feature and Limit
+# Feature and Limitation
 ## Limitation Now
 + All defined file should in one particular directory like `./modules`.
 + Only optimize `define` module, non-support with `require`.
 + Non-support with specific config options like `path`, `shim`, `map`, all module name(auto added)
-  and module dependent name should be relative path without dot, oblique, or extname. 
+  and module dependent name should be relative path *without dot, oblique, or extname*. 
++ Non-support with requirejs plugin.
 
 ## Feature
-+ Support single requirejs file optimize. (Finished, and still some bug not coveraged by UT)
-+ Support multi requirejs file optimize. (Developing, next version support)
-+ Support specific config options. (Pending)
++ Support single requirejs file optimize. (Finished, maybe some bug not coveraged by UT)
++ Support multi requirejs file optimize. (Finished, maybe some bug not coverage by UT)
++ Support specific config options, such as path, shim, map. (Developing)
++ Support requirejs plugin. (Pending)
 
-# Progress
-+ Till now, it just support single file optimize with `define` style, just execute `gulp example-basic`
-  or `gulp example-sub` to see the effect. javascript files in sub-directory of baseUrl accepted.
-+ options
+## options
+Only two config options provided now.
 ```javascript
 {
-    // the baseUrl to search modules
+    // the baseUrl to search modules, relative to `gulpfile.js`
     baseUrl: './test/fixtures',
-    // the module name you want to optimize
+    // the module name you want to optimize, string or array
     module: 'optimize-info'
 }
 ```
+
+# Progress
+## Single file optimize.
++ Till now, it just support single file optimize with `define` style, just execute `gulp example-basic`
+  or `gulp example-sub` to see the effect. javascript files in sub-directory of baseUrl accepted.
+
 + In the `example-basic`, you have three modules in the `baseUrl` directory as below:
 
 lang.js
@@ -60,9 +66,6 @@ define('logger',[],function (){});
 define('optimize-info',['lang','logger'],function (lang,logger){});
 ```
 
-+ `example-sub` almost act the same way, you will get `dist/optimize-sub.js`.
-```javascript
-define('lang',[],function (){});
-define('subFixtures/html',[],function (){});
-define('optimize-sub',['lang','subFixtures/html'],function (lang,html){});
-```
+## Multiple file optimize.
++ Till now, it just support multiple file optimize with `define` style, just execute `gulp example-multi`
+  to see the effect. You will get `dist/optimize-info.js`, `dist/optimize-sub.js`.

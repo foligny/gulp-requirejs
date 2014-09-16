@@ -35,3 +35,12 @@ gulp.task('example-sub', function() {
         }))
         .pipe(gulp.dest('dist'));
 });
+
+gulp.task('example-multi', function() {
+    return  gulp.src('./test/fixtures/**/*.js')
+        .pipe(gulpRequirejs({
+            baseUrl: './test/fixtures',
+            module: ['optimize-info', 'optimize-sub']
+        }))
+        .pipe(gulp.dest('dist'));
+});
