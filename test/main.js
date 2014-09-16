@@ -15,7 +15,9 @@ describe('gulp-requirejs-errors', function () {
 
     it('should emit error when streamed file', function (done) {
         gulp.src(['./test/fixtures/lang.js'], {buffer: false})
-            .pipe(gulpRequirejs({}))
+            .pipe(gulpRequirejs({
+                module: 'main'
+            }))
             .on('error', function(err) {
                 err.message.should.eql('Stream not supported');
                 done();
@@ -25,14 +27,14 @@ describe('gulp-requirejs-errors', function () {
     it('should emit error when missing required modules', function (done) {
         gulp.src('./test/fixtures/*.js')
             .pipe(gulpRequirejs({
-                baseUrl: './fixtures',
+                baseUrl: './test/fixtures',
                 path: {
                     "optimize-error": "optimize-error"
                 },
-                modules: [{name: 'optimize-error'}]
+                module: 'optimize-error'
             }))
             .on('error', function(err) {
-                err.message.should.eql('missing required modules');
+                err.message.should.eql('Missing required module');
                 done();
             });
     });
@@ -42,15 +44,12 @@ describe('gulp-requirejs-optimize', function () {
     it('should match the template file', function(done) {
         gulp.src('./test/fixtures/*.js')
             .pipe(gulpRequirejs({
-                baseUrl: './fixtures',
-                path: {
-                    "optimize-info": "optimize-info"
-                },
-                modules: [{ name: 'optimize-info' }]
+                baseUrl: './test/fixtures',
+                module: 'optimize-info'
             }))
             .pipe(assert.first(function(file){
                 var compare = "define('lang',[],function(){});define('logger',[],function(){});define('optimize-info',['lang','logger'],function(lang,logger){});";
-                file.contents.toString().should.eql(compare);
+                (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
             }))
             .on('end', done);
     });

@@ -15,6 +15,14 @@ gulp.task('jshint', function() {
 });
 
 gulp.task('test', ['jshint'], function() {
-    return gulp.src('test/main.js', {read: false})
-        .pipe(mocha());
+    return gulp.src('test/main.js', {read: false}).pipe(mocha());
+});
+
+gulp.task('example', function() {
+    return  gulp.src('./test/fixtures/*.js')
+        .pipe(gulpRequirejs({
+            baseUrl: './test/fixtures',
+            module: 'optimize-info'
+        }))
+        .pipe(gulp.dest('dist'));
 });

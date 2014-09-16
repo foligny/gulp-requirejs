@@ -6,3 +6,4 @@ examples
 test
 Makefile
 coverage
+dist

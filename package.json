@@ -1,7 +1,7 @@
 {
   "name": "gulp-requirejs-optimizer",
-  "version": "0.2.0",
-  "description": "Parallel migration from grunt-contrib-requirejs to gulp-requirejs ",
+  "version": "0.3.0",
+  "description": "personal achieve project for requirejs optimize --- gulp-requirejs ",
   "main": "index.js",
   "scripts": {
     "test": "gulp test"
@@ -16,7 +16,8 @@
   "dependencies": {
     "gulp-util": "^3.0.1",
     "merge": "^1.2.0",
-    "through-gulp": "^0.2.0"
+    "through-gulp": "^0.2.0",
+    "through2": "^0.6.1"
   },
   "devDependencies": {
     "gulp": "^3.8.7",
