@@ -18,11 +18,20 @@ gulp.task('test', ['jshint'], function() {
     return gulp.src('test/main.js', {read: false}).pipe(mocha());
 });
 
-gulp.task('example', function() {
+gulp.task('example-basic', function() {
     return  gulp.src('./test/fixtures/*.js')
         .pipe(gulpRequirejs({
             baseUrl: './test/fixtures',
             module: 'optimize-info'
+        }))
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('example-sub', function() {
+    return  gulp.src('./test/fixtures/**/*.js')
+        .pipe(gulpRequirejs({
+            baseUrl: './test/fixtures',
+            module: 'optimize-sub'
         }))
         .pipe(gulp.dest('dist'));
 });

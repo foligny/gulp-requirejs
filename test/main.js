@@ -19,6 +19,7 @@ describe('gulp-requirejs-errors', function () {
     it('should emit error when streamed file', function (done) {
         gulp.src(['./test/fixtures/lang.js'], {buffer: false})
             .pipe(gulpRequirejs({
+                baseUrl: './test/fixture',
                 module: 'main'
             }))
             .on('error', function(err) {
@@ -31,9 +32,6 @@ describe('gulp-requirejs-errors', function () {
         gulp.src('./test/fixtures/*.js')
             .pipe(gulpRequirejs({
                 baseUrl: './test/fixtures',
-                path: {
-                    "optimize-error": "optimize-error"
-                },
                 module: 'optimize-error'
             }))
             .on('error', function(err) {
@@ -44,7 +42,7 @@ describe('gulp-requirejs-errors', function () {
 });
 
 describe('gulp-requirejs-optimize', function () {
-    it('should match the template file', function(done) {
+    it('should match the basic template file', function(done) {
         gulp.src('./test/fixtures/*.js')
             .pipe(gulpRequirejs({
                 baseUrl: './test/fixtures',
@@ -52,6 +50,19 @@ describe('gulp-requirejs-optimize', function () {
             }))
             .pipe(assert.first(function(file){
                 var compare = "define('lang',[],function(){});define('logger',[],function(){});define('optimize-info',['lang','logger'],function(lang,logger){});";
+                (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
+            }))
+            .on('end', done);
+    });
+
+    it('should match the sub template file', function(done) {
+        gulp.src('./test/fixtures/**/*.js')
+            .pipe(gulpRequirejs({
+                baseUrl: './test/fixtures',
+                module: 'optimize-sub'
+            }))
+            .pipe(assert.first(function(file){
+                var compare = "define('lang',[],function(){});define('subFixtures/html',[],function(){});define('optimize-sub',['lang','subFixtures/html'],function(lang,html){});";
                 (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
             }))
             .on('end', done);
@@ -102,12 +113,6 @@ describe('parse module', function () {
         result = parse.pushModuleDependencies(sample, ['lang', 'logger']).replace(/\s*/g, "");
         result.should.equal("define(['lang','logger'],function(){})");
     });
-
-    describe('normalize-path module', function () {
-        it('should get proper file relative path', function () {
-
-        });
-    });
 });
 
 describe('normalize path module', function () {
@@ -120,7 +125,7 @@ describe('normalize path module', function () {
                 relativePath.should.equal(path.join('fixtures', 'lang'));
                 callback();
                 done();
-            }))
+            }));
     });
 
     it('should normalize dependent path', function (done) {
@@ -133,6 +138,6 @@ describe('normalize path module', function () {
                 fileRelativePath.should.equal(dependentRelativePath);
                 callback();
                 done();
-            }))
+            }));
     });
 });
