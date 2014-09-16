@@ -5,24 +5,30 @@ gulp-requirejs
 ![Package Dependency](https://david-dm.org/bornkiller/gulp-requirejs.svg?style=flat)
 ![Package DevDependency](https://david-dm.org/bornkiller/gulp-requirejs/dev-status.svg?style=flat)
 
-Parallel migration from grunt-contrib-requirejs to gulp-requirejs
+Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`. 
 
-#Warning
-The project start from 2014/09/10, and far away from production environment.
-welcome any pull request, I promise to lookup any modification, or just become collaborator through
-send me an email hjj491229492@hotmail.com.
+# Warning
++ The project still in early state of development and far away from production environment.
+  welcome any pull request, I promise to lookup any modification, or just become collaborator through
+  send me an email hjj491229492@hotmail.com.
++ Expected first release version before 2014/09/31.
++ Regular maintain and version upgrade after the chinese National Day. 
 
-## Schedule
-+ ~~make basic unit test ready before 2014/09/14.~~
-+ provide an extremely simplify r.js or another custom module for cool optimize invoke during 
-  2014/09/14----2014/09/24 or just longer for a while.
-+ expected first release version before 2014/09/31.
-+ regular maintain and version upgrade after the chinese National Day. 
+# Feature and Limit
+## Limitation Now
++ All defined file should in one particular directory like `./modules`.
++ Only optimize `define` module, non-support with `require`.
++ Non-support with specific config options like `path`, `shim`, `map`, all module name(auto added)
+  and module dependent name should be relative path without dot, oblique, or extname. 
 
-## Progress
-+ Till now, it just support single file optimize with `define` style, just execute `gulp example`
-  to see the effect. And all javascript file is in the `baseUrl` directory, when just in sub-directory,
-  I'm not sure what would happen. Next version ensure this doubt.
+## Feature
++ Support single requirejs file optimize. (Finished, and still some bug not coveraged by UT)
++ Support multi requirejs file optimize. (Developing, next version support)
++ Support specific config options. (Pending)
+
+# Progress
++ Till now, it just support single file optimize with `define` style, just execute `gulp example-basic`
+  or `gulp example-sub` to see the effect. javascript files in sub-directory of baseUrl accepted.
 + options
 ```javascript
 {
@@ -32,7 +38,7 @@ send me an email hjj491229492@hotmail.com.
     module: 'optimize-info'
 }
 ```
-+ In the example, you have three modules in the `baseUrl` directory as below:
++ In the `example-basic`, you have three modules in the `baseUrl` directory as below:
 
 lang.js
 ```javascript
@@ -47,65 +53,16 @@ optimize-info.js
 define(['lang','logger'],function(lang,logger){});
 ```
 
-after `gulp example`, you will got `dist/optimize-info.js`, whose contents as below:
+after `gulp example-basic`, you will get `dist/optimize-info.js`, whose contents as below:
 ```javascript
 define('lang',[],function (){});
 define('logger',[],function (){});
 define('optimize-info',['lang','logger'],function (lang,logger){});
 ```
 
-## Parse module 
-parse module should get useful information and preprocess the modules during transformFunction.
++ `example-sub` almost act the same way, you will get `dist/optimize-sub.js`.
 ```javascript
-module.exports = {
-    /**
-     * @description
-     * To get proper module name, judge if the name is absent
-     * @param {string} fileContents
-     * the original file content to analyze to get module name
-     * @returns {string} the module name from file contents, empty when undeclared
-     */
-	getModuleName: function(fileContents) {
-        return '';
-    },
-
-    /**
-     * @description
-     * To get proper module dependencies name.
-     * @param {string} fileContents
-     * the original file content to set explicit module name
-     * @param {string} name
-     * the proper name the module should be
-     * @returns {string}  resolved file contents with module name, and ready for concat
-     */
-    setModuleName: function(fileContents, name) {
-        return fileContents;
-    },
-
-    /**
-     * @description
-     * To get proper module dependencies name.
-     * @param {string} fileContents
-     * the original file content to analyze to get module dependencies name
-     * @returns {array}
-     * the module dependencies name from file contents, empty when undeclared
-     */
-	getModuleDependencies: function(fileContents) {
-        return ;
-    },
-
-    /**
-     * @description
-     * To push proper module dependencies name.
-     * @param {string} fileContents
-     * the original file content to analyze to get module dependencies name
-     * @param {array} modules
-     * the module dependency to add, normally used for recursive.
-     * @returns {array}
-     * the module dependencies name from file contents, empty when undeclared
-     */
-    pushModuleDependencies: function(fileContents, modules) {
-        return ;
-    }
-};
+define('lang',[],function (){});
+define('subFixtures/html',[],function (){});
+define('optimize-sub',['lang','subFixtures/html'],function (lang,html){});
 ```
