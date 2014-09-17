@@ -57,5 +57,19 @@ gulp.task('example-path', function() {
         .pipe(gulp.dest('dist'));
 });
 
+gulp.task('example-outside', function() {
+    return gulp.src(['./test/fixtures/**/*.js','./test/mockLibs/**/*.js'])
+        .pipe(gulpRequirejs({
+            baseUrl: './test/fixtures',
+            path: {
+               'html': 'subFixtures/html',
+               'jquery': '../mockLibs/jquery',
+               'client': '../mockLibs/client'
+            },
+            module: 'optimize-outside'
+        }))
+        .pipe(gulp.dest('dist'));
+});
+
 
 
