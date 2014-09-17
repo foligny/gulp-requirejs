@@ -85,5 +85,5 @@ define('optimize-info',['lang','logger'],function (lang,logger){});
 + Till now, it just support path config file optimize in the specific directory with `define` style, just 
   execute `gulp example-path` to see the effect. You will get `dist/optimize-path.js`.
 
-+ Till now, it just support path config file optimize outside the specific directory, just execute \
++ Till now, it just support path config file optimize outside the specific directory, just execute 
   `gulp example-path` to see the effect. You will get `dist/optimize-outside.js`.
