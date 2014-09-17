@@ -1,6 +1,7 @@
 var gutil = require('gulp-util');
 var through = require('through-gulp');
 var path = require('path');
+var _ = require('underscore');
 var parse = require('./src/parse.js');
 var normalizer = require('./src/normalize-path.js');
 var PluginError = gutil.PluginError;
@@ -29,9 +30,19 @@ module.exports = function(opts) {
       if (file.isBuffer()) {
           fullBasePath = path.resolve(file.cwd, opts.baseUrl);
           var relativePath = normalizer.normalizeFileRelative(fullBasePath, file.path).replace(/\\/g, '/');
-          var resolvedContents = parse.setModuleName(file.contents.toString(), relativePath);
+          var configPath = opts.path;
+          var storageKey = null;
+          var keys = _.keys(configPath);
+          var values = _.values(configPath);
+          if (values.indexOf(relativePath) !== -1) {
+              var index = values.indexOf(relativePath);
+              storageKey = keys[index];
+          } else {
+              storageKey = relativePath;
+          }
+          var resolvedContents = parse.setModuleName(file.contents.toString(), storageKey);
           file.contents = new Buffer(resolvedContents);
-          moduleStorage[relativePath] = file;
+          moduleStorage[storageKey] = file;
           callback();
       }
   }
@@ -56,8 +67,8 @@ module.exports = function(opts) {
       var targetModule = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
       var targetFile = moduleStorage[targetModule];
       var originalDependencies = parse.getModuleDependencies(targetFile.contents.toString());
-      var dependentContents;
-      var missedModule;
+      var dependentContents = null;
+      var missedModule = null;
       var missingModule = originalDependencies.some(function(value) {
           if (!moduleStorage[value]) {
               missedModule = value;
