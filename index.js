@@ -43,8 +43,8 @@ module.exports = function(opts) {
       optimizedArray = optimizedArray.concat(opts.module);
       optimizedArray.forEach(function(value) {
           file = optimize(value);
-          if (!file) {
-              self.emit('error', new PluginError(PLUGIN_NAME, 'Missing required module'));
+          if (typeof file === 'string') {
+              self.emit('error', new PluginError(PLUGIN_NAME, 'Missing required module ' + file + ' in ' + value));
           } else {
               self.push(file);
           }
@@ -57,11 +57,17 @@ module.exports = function(opts) {
       var targetFile = moduleStorage[targetModule];
       var originalDependencies = parse.getModuleDependencies(targetFile.contents.toString());
       var dependentContents;
+      var missedModule;
       var missingModule = originalDependencies.some(function(value) {
-          return !moduleStorage[value];
+          if (!moduleStorage[value]) {
+              missedModule = value;
+              return true;
+          } else {
+              return false;
+          }
       });
       if (missingModule) {
-          return false;
+          return missedModule;
       } else {
           dependentContents = originalDependencies.map(function(value) {
               return moduleStorage[value].contents.toString() + ';';
