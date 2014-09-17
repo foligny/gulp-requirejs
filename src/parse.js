@@ -84,7 +84,6 @@ module.exports = {
             var implement = null;
             if (typeof name === 'string' && Object.prototype.toString.call(dependencies) === '[object Array]') {
                 result = "define('" + name.toString() + "',[" ;
-                console.log(name);
                 deps = dependencies.concat(moduleNames);
                 implement = typeof structure !== 'undefined'? structure : '';
             } else if (Object.prototype.toString.call(name) === '[object Array]') {

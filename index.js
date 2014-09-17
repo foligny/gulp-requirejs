@@ -32,6 +32,7 @@ module.exports = function(opts) {
           var relativePath = normalizer.normalizeFileRelative(fullBasePath, file.path).replace(/\\/g, '/');
           var configPath = opts.path;
           var storageKey = null;
+          var resolvedContents = null;
           var keys = _.keys(configPath);
           var values = _.values(configPath);
           if (values.indexOf(relativePath) !== -1) {
@@ -40,7 +41,12 @@ module.exports = function(opts) {
           } else {
               storageKey = relativePath;
           }
-          var resolvedContents = parse.setModuleName(file.contents.toString(), storageKey);
+
+          if (relativePath.indexOf('../') === -1) {
+              resolvedContents = parse.setModuleName(file.contents.toString(), storageKey);
+          } else {
+              resolvedContents = file.contents.toString();
+          }
           file.contents = new Buffer(resolvedContents);
           moduleStorage[storageKey] = file;
           callback();
@@ -69,6 +75,7 @@ module.exports = function(opts) {
       var originalDependencies = parse.getModuleDependencies(targetFile.contents.toString());
       var dependentContents = null;
       var missedModule = null;
+      var configPath = opts.path;
       var missingModule = originalDependencies.some(function(value) {
           if (!moduleStorage[value]) {
               missedModule = value;
@@ -81,7 +88,16 @@ module.exports = function(opts) {
           return missedModule;
       } else {
           dependentContents = originalDependencies.map(function(value) {
-              return moduleStorage[value].contents.toString() + ';';
+              if (_.has(configPath, value)) {
+                  if (configPath[value].indexOf('../') !== -1) {
+                      return moduleStorage[value].contents.toString();
+                  } else {
+                      return moduleStorage[value].contents.toString() + ';';
+                  }
+              }
+              else {
+                  return moduleStorage[value].contents.toString() + ';';
+              }
           });
           dependentContents.push(targetFile.contents.toString() + ';');
           return new File({

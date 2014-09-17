@@ -1,0 +1,1 @@
+define(['html','jquery','client'],function(html,jquery,client){});
