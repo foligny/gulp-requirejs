@@ -17,16 +17,19 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 # Feature and Limitation
 ## Limitation Now
 + All defined file should in one particular directory like `./modules`.
++ When `opts.path` undeclared, all module name(auto added) and module dependent name should be relative 
+  path **without dot, oblique at the beginning or extname at the end**. 
++ When `opts.path` declared, module name would be `path config` value, not original relative path. 
 + Only optimize `define` module, non-support with `require`.
-+ Non-support with specific config options like `path`, `shim`, `map`, all module name(auto added)
-  and module dependent name should be relative path *without dot, oblique, or extname*. 
-+ Non-support with requirejs plugin.
++ Non-support with requirejs plugin, which means error throw.
 
 ## Feature
 + Support single requirejs file optimize. (Finished, maybe some bug not coveraged by UT)
 + Support multi requirejs file optimize. (Finished, maybe some bug not coverage by UT)
-+ Support specific config options, such as path, shim, map. (Developing)
-+ Support requirejs plugin. (Pending)
++ Support specific config options `path`. (Half-Finished, maybe some bug not coverage by UT
+  the path only mapping modules in the specific directory, not outside this directory)
++ Files not in this directory will import. Third-party libs or `requirejs` specific module like 
+  `jquery` could import into the optimized file. (Developing, next version). 
 
 ## options
 Only two config options provided now.
@@ -34,6 +37,11 @@ Only two config options provided now.
 {
     // the baseUrl to search modules, relative to `gulpfile.js`
     baseUrl: './test/fixtures',
+    // the mapping about specific module, dependent on `html` means 
+    // `subFixtures/html.js` file will be imported.
+    path: {
+        'html': 'subFixtures/html'
+    },
     // the module name you want to optimize, string or array
     module: 'optimize-info'
 }
@@ -69,3 +77,7 @@ define('optimize-info',['lang','logger'],function (lang,logger){});
 ## Multiple file optimize.
 + Till now, it just support multiple file optimize with `define` style, just execute `gulp example-multi`
   to see the effect. You will get `dist/optimize-info.js`, `dist/optimize-sub.js`.
+
+## Path config file optimize.
++ Till now, it just support path config file optimize with `define` style, just execute `gulp example-path`
+  to see the effect. You will get `dist/optimize-path.js`.

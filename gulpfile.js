@@ -44,3 +44,18 @@ gulp.task('example-multi', function() {
         }))
         .pipe(gulp.dest('dist'));
 });
+
+gulp.task('example-path', function() {
+    return gulp.src('./test/fixtures/**/*.js')
+        .pipe(gulpRequirejs({
+            baseUrl: './test/fixtures',
+            path: {
+                'html': 'subFixtures/html'
+            },
+            module: 'optimize-path'
+        }))
+        .pipe(gulp.dest('dist'));
+});
+
+
+
