@@ -71,5 +71,16 @@ gulp.task('example-outside', function() {
         .pipe(gulp.dest('dist'));
 });
 
-
+gulp.task('example-plugin', function() {
+    return  gulp.src(['./test/fixtures/optimize-plugin.js','./test/plugins/html.js'])
+          .pipe(gulpRequirejs({
+              baseUrl: './test/fixtures',
+              path: {
+                  'html': '../plugins/html'
+              },
+              module: 'optimize-plugin',
+              plugin: true
+          }))
+          .pipe(gulp.dest('dist'));
+})
 

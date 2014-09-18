@@ -1,5 +1,6 @@
 var gutil = require('gulp-util');
 var through = require('through-gulp');
+var merge = require('merge');
 var path = require('path');
 var _ = require('underscore');
 var parse = require('./src/parse.js');
@@ -8,12 +9,19 @@ var PluginError = gutil.PluginError;
 var File = gutil.File;
 var PLUGIN_NAME = 'gulp-requirejs-optimizer';
 
-module.exports = function(opts) {
-  if (!opts || !opts.module || !opts.baseUrl) {
+module.exports = function(options) {
+  if (!options|| !options.module || !options.baseUrl) {
   	  throw new PluginError(PLUGIN_NAME, 'Missing options for gulp-requirejs-optimizer');
   }
   var moduleStorage = {};
   var fullBasePath;
+  var defaultOpts = {
+      baseUrl: '',
+      path: {},
+      module: [],
+      plugin: true
+  };
+  var opts = merge(defaultOpts, options);
 
   function transformBuffer(file, encoding, callback) {
   	  if (file.isNull()) {
@@ -73,10 +81,19 @@ module.exports = function(opts) {
       var targetModule = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
       var targetFile = moduleStorage[targetModule];
       var originalDependencies = parse.getModuleDependencies(targetFile.contents.toString());
+      var resolvedDependencies = [];
       var dependentContents = null;
       var missedModule = null;
       var configPath = opts.path;
-      var missingModule = originalDependencies.some(function(value) {
+      originalDependencies.forEach(function(moduleName) {
+          if (moduleName.indexOf('!') === -1) {
+              resolvedDependencies.push(moduleName);
+          } else if (moduleName.indexOf('!') !== -1 && opts.plugin) {
+              var pluginName = moduleName.split('!')[0];
+              resolvedDependencies.push(pluginName);
+          }
+      });
+      var missingModule = resolvedDependencies.some(function(value) {
           if (!moduleStorage[value]) {
               missedModule = value;
               return true;
@@ -87,7 +104,7 @@ module.exports = function(opts) {
       if (missingModule) {
           return missedModule;
       } else {
-          dependentContents = originalDependencies.map(function(value) {
+          dependentContents = resolvedDependencies.map(function(value) {
               if (_.has(configPath, value)) {
                   if (configPath[value].indexOf('../') !== -1) {
                       return moduleStorage[value].contents.toString();

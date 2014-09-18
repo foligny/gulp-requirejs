@@ -102,6 +102,40 @@ describe('gulp-requirejs-optimize', function () {
           .on('end', done);
   });
 
+  it('should optimize file with requirejs plugins with import plugin contents', function(done) {
+      gulp.src(['./test/fixtures/optimize-plugin.js','./test/plugins/html.js'])
+          .pipe(gulpRequirejs({
+              baseUrl: './test/fixtures',
+              path: {
+                  'html': '../plugins/html'
+              },
+              module: 'optimize-plugin',
+              plugin: true
+          }))
+          .pipe(assert.first(function(file){
+              var compare = "define('html',[],function(){});define('optimize-plugin',['html!main'],function(section){});";
+              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
+          }))
+          .on('end', done);
+  });
+
+  it('should optimize file with requirejs plugins without import plugin contents', function(done) {
+      gulp.src(['./test/fixtures/optimize-plugin.js','./test/plugins/html.js'])
+          .pipe(gulpRequirejs({
+              baseUrl: './test/fixtures',
+              path: {
+                  'html': '../plugins/html'
+              },
+              module: 'optimize-plugin',
+              plugin: false
+          }))
+          .pipe(assert.first(function(file){
+              var compare = "define('optimize-plugin',['html!main'],function(section){});";
+              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
+          }))
+          .on('end', done);
+  });
+  
   it('should optimize multiple file', function(done) {
       gulp.src('./test/fixtures/**/*.js')
           .pipe(gulpRequirejs({
