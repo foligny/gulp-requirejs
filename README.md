@@ -28,17 +28,12 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 + Support multi requirejs file optimize. (Finished, maybe some bug not coverage by UT)
 + Support specific config options `path`. (Finished, maybe some bug not coverage by UT
   the path maps modules in the specific directory, or others outside the directory)
-+ Files outside the directory will import. Third-party `requirejs` specific module or libs like 
-  `jquery` would import into the optimized file without processing.(Finished, maybe some bug 
-  not coverage by UT)
-+ Partial plugin support, when you have dependency like `define['html!template/main'],function(template){})`,
-  error event doesn't emit anymore since v0.8.0, and optional import the plugin contents by `opts.plugin`. 
-  Because of directly import, maybe you should add explicit plugin module name manually, any way, tough stuff. 
-  (Pending).
++ Files outside the directory will import. Third-party libs like `jquery` would import into the optimized
+  file without processing.(Finished, maybe some bug not coverage by UT)
 + Partial plugin support, when you have dependency like `define['html!template/main'],function(template){})`,
   error event doesn't emit anymore since v0.8.5, and optional import the plugin contents by `opts.plugin`. 
   any way, tough stuff(Finished).
-+ Support recursive moduleDependency next version v0.9.0.
++ Support recursive moduleDependency next version v0.9.0(Develop).
 
 lang.js
 ```javascript
