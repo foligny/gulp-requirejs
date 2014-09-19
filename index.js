@@ -91,8 +91,8 @@ module.exports = function(options) {
       var recursiveProvisionDependencies = [];
       var finalDependencies = [];
       _.each(initialPluginResolvedDependencies, function(dependency) {
-          recursiveProvisionDependencies = recursiveProvisionDependencies.concat(parse.getModuleDependencies(container[dependency].contents.toString()));
-          directProvisionDependencies = directProvisionDependencies.concat(dependency);
+          recursiveProvisionDependencies = _.union(recursiveProvisionDependencies, parse.getModuleDependencies(container[dependency].contents.toString()));
+          directProvisionDependencies.push(dependency);
       });
       finalDependencies = _.union(recursiveProvisionDependencies, directProvisionDependencies);
       finalDependencies = _.without(finalDependencies, 'module');
@@ -105,14 +105,17 @@ module.exports = function(options) {
   }
 
   function resolvePluginDependencies(initialDependencies) {
-      return _.map(initialDependencies, function (dependency) {
+      var resolvedResult = [];
+      _.each(initialDependencies, function(dependency) {
           if (dependency.indexOf('!') === -1) {
-              return dependency;
+              resolvedResult.push(dependency);
           }
           if (dependency.indexOf('!') !== -1 && opts.plugin) {
-              return dependency.split('!')[0];
+              resolvedResult.push(dependency.split('!')[0]);
           }
       });
+
+      return resolvedResult;
   }
   function checkDependencyMiss(container, dependencies) {
       _.each(dependencies, function(dependency) {
