@@ -18,7 +18,8 @@ module.exports = function(options) {
       baseUrl: '',
       path: {},
       module: [],
-      plugin: true
+      plugin: false,
+      recursive: false
   };
   var opts = _.extend(defaultOpts, options);
 
@@ -73,36 +74,61 @@ module.exports = function(options) {
       callback();
   }
 
+  function getFinalModuleDependencies(container, moduleName, recursive) {
+      var initialDependencies = parse.getModuleDependencies(container[moduleName].contents.toString());
+      var initialPluginResolvedDependencies =_.without(resolvePluginDependencies(initialDependencies), 'module');
+      try {
+          checkDependencyMiss(container, initialPluginResolvedDependencies);
+      } catch (err) {
+          throw err;
+      }
+
+      if (!recursive) {
+          return initialPluginResolvedDependencies;
+      }
+
+      var directProvisionDependencies = [];
+      var recursiveProvisionDependencies = [];
+      var finalDependencies = [];
+      _.each(initialPluginResolvedDependencies, function(dependency) {
+          recursiveProvisionDependencies = recursiveProvisionDependencies.concat(parse.getModuleDependencies(container[dependency].contents.toString()));
+          directProvisionDependencies = directProvisionDependencies.concat(dependency);
+      });
+      finalDependencies = _.union(recursiveProvisionDependencies, directProvisionDependencies);
+      finalDependencies = _.without(finalDependencies, 'module');
+      try {
+          checkDependencyMiss(container, finalDependencies);
+          return finalDependencies;
+      } catch (err) {
+          throw err;
+      }
+  }
+
+  function resolvePluginDependencies(initialDependencies) {
+      return _.map(initialDependencies, function (dependency) {
+          if (dependency.indexOf('!') === -1) {
+              return dependency;
+          }
+          if (dependency.indexOf('!') !== -1 && opts.plugin) {
+              return dependency.split('!')[0];
+          }
+      });
+  }
+  function checkDependencyMiss(container, dependencies) {
+      _.each(dependencies, function(dependency) {
+          if (!_.has(container, dependency)) {
+              throw new Error(dependency.toString());
+          }
+      });
+  }
   function optimize(moduleName) {
       // optimized module must be relative path, Maybe bug somewhere
-      var targetModule = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
-      var targetFile = moduleStorage[targetModule];
-      var originalDependencies = parse.getModuleDependencies(targetFile.contents.toString());
-      var resolvedDependencies = [];
-      var dependentContents = null;
-      var missedModule = null;
+      var targetModuleName = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
       var configPath = opts.path;
-      _.each(originalDependencies, function(dependency) {
-          if (dependency.indexOf('!') === -1) {
-              resolvedDependencies.push(dependency);
-          } else if (dependency.indexOf('!') !== -1 && opts.plugin) {
-              resolvedDependencies.push(dependency.split('!')[0])
-          }
-      });
-      _.without(resolvedDependencies, 'module');
-      var missingModule = _.some(resolvedDependencies, function(dependency) {
-          if (!_.has(moduleStorage, dependency)) {
-              missedModule = dependency;
-              return true;
-          } else {
-              return false;
-          }
-      });
-
-      if (missingModule) {
-          return missedModule;
-      } else {
-          dependentContents = _.map(resolvedDependencies, function(dependency) {
+      var finalDependencies;
+      try {
+          finalDependencies = getFinalModuleDependencies(moduleStorage, targetModuleName, opts.recursive);
+          finalDependentContents = _.map(finalDependencies, function(dependency) {
               if (_.has(configPath, dependency) && configPath[dependency].indexOf('../') !== -1) {
                   return moduleStorage[dependency].contents.toString();
               }
@@ -110,11 +136,13 @@ module.exports = function(options) {
                   return moduleStorage[dependency].contents.toString() + ';';
               }
           });
-          dependentContents.push(targetFile.contents.toString() + ';');
+          finalDependentContents.push(moduleStorage[targetModuleName].contents.toString() + ';');
           return new File({
-              path: targetModule + '.js',
-              contents: new Buffer(dependentContents.join('\n'))
+              path: targetModuleName + '.js',
+              contents: new Buffer(finalDependentContents.join('\n'))
           });
+      } catch (err) {
+          return err.message;
       }
   }
   return through(transformBuffer, flushBuffer);

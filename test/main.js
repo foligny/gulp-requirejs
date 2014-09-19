@@ -157,6 +157,25 @@ describe('gulp-requirejs-optimize', function () {
           .on('end', done);
   });
 
+  it('should optimize file with requirejs plugins import plugin contents recursively', function(done) {
+      gulp.src(['./test/fixtures/optimize-recursive-plugin.js','./test/fixtures/plugins/*.js'])
+          .pipe(gulpRequirejs({
+              baseUrl: './test/fixtures',
+              path: {
+                  'html': 'plugins/html',
+                  'json': 'plugins/json',
+                  'text': 'plugins/text'
+              },
+              module: 'optimize-recursive-plugin',
+              plugin: false
+          }))
+          .pipe(assert.first(function(file){
+              var compare = "define('text',['module'],function (module){});define('html',['text'],function(text){});define('json',['text'],function(text){});define('optimize-recursive-plugin',['html!section','json!config'],function(section,config){});";
+              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
+          }))
+          .on('end', done);
+  });
+
 });
 
 describe('parse module', function () {

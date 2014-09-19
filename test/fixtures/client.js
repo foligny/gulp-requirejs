@@ -1,0 +1,1 @@
+define(['lang'],function(lang){});
