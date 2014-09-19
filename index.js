@@ -129,6 +129,7 @@ module.exports = function(options) {
       var targetModuleName = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
       var configPath = opts.path;
       var finalDependencies;
+      var finalDependentContents;
       try {
           finalDependencies = getFinalModuleDependencies(moduleStorage, targetModuleName, opts.recursive);
           finalDependentContents = _.map(finalDependencies, function(dependency) {
