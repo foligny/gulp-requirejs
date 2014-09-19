@@ -1,6 +1,6 @@
 {
   "name": "gulp-requirejs-optimizer",
-  "version": "0.8.0",
+  "version": "0.8.5",
   "description": "personal achieve project for requirejs optimize --- gulp-requirejs ",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,6 @@
   ],
   "dependencies": {
     "gulp-util": "^3.0.1",
-    "merge": "^1.2.0",
     "through-gulp": "^0.2.0",
     "through2": "^0.6.1",
     "underscore": "^1.7.0"

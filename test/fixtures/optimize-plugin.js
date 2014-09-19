@@ -1,1 +1,1 @@
-define(['html!main'],function(section){});
+define(['html!section','json!config'],function(section,config){});

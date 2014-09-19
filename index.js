@@ -1,6 +1,5 @@
 var gutil = require('gulp-util');
 var through = require('through-gulp');
-var merge = require('merge');
 var path = require('path');
 var _ = require('underscore');
 var parse = require('./src/parse.js');
@@ -21,7 +20,7 @@ module.exports = function(options) {
       module: [],
       plugin: true
   };
-  var opts = merge(defaultOpts, options);
+  var opts = _.extend(defaultOpts, options);
 
   function transformBuffer(file, encoding, callback) {
   	  if (file.isNull()) {
@@ -38,14 +37,11 @@ module.exports = function(options) {
       if (file.isBuffer()) {
           fullBasePath = path.resolve(file.cwd, opts.baseUrl);
           var relativePath = normalizer.normalizeFileRelative(fullBasePath, file.path).replace(/\\/g, '/');
-          var configPath = opts.path;
+          var invertConfigPath = _.invert(opts.path);
           var storageKey = null;
           var resolvedContents = null;
-          var keys = _.keys(configPath);
-          var values = _.values(configPath);
-          if (values.indexOf(relativePath) !== -1) {
-              var index = values.indexOf(relativePath);
-              storageKey = keys[index];
+          if (_.has(invertConfigPath, relativePath)) {
+              storageKey = invertConfigPath[relativePath];
           } else {
               storageKey = relativePath;
           }
@@ -66,10 +62,10 @@ module.exports = function(options) {
       var optimizedArray = [];
       var self = this;
       optimizedArray = optimizedArray.concat(opts.module);
-      optimizedArray.forEach(function(value) {
-          file = optimize(value);
+      _.each(optimizedArray, function(moduleName) {
+          file = optimize(moduleName);
           if (typeof file === 'string') {
-              self.emit('error', new PluginError(PLUGIN_NAME, 'Missing required module ' + file + ' in ' + value));
+              self.emit('error', new PluginError(PLUGIN_NAME, 'Missing required module ' + file + ' in ' + moduleName));
           } else {
               self.push(file);
           }
@@ -78,6 +74,7 @@ module.exports = function(options) {
   }
 
   function optimize(moduleName) {
+      // optimized module must be relative path, Maybe bug somewhere
       var targetModule = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
       var targetFile = moduleStorage[targetModule];
       var originalDependencies = parse.getModuleDependencies(targetFile.contents.toString());
@@ -85,35 +82,32 @@ module.exports = function(options) {
       var dependentContents = null;
       var missedModule = null;
       var configPath = opts.path;
-      originalDependencies.forEach(function(moduleName) {
-          if (moduleName.indexOf('!') === -1) {
-              resolvedDependencies.push(moduleName);
-          } else if (moduleName.indexOf('!') !== -1 && opts.plugin) {
-              var pluginName = moduleName.split('!')[0];
-              resolvedDependencies.push(pluginName);
+      _.each(originalDependencies, function(dependency) {
+          if (dependency.indexOf('!') === -1) {
+              resolvedDependencies.push(dependency);
+          } else if (dependency.indexOf('!') !== -1 && opts.plugin) {
+              resolvedDependencies.push(dependency.split('!')[0])
           }
       });
-      var missingModule = resolvedDependencies.some(function(value) {
-          if (!moduleStorage[value]) {
-              missedModule = value;
+      _.without(resolvedDependencies, 'module');
+      var missingModule = _.some(resolvedDependencies, function(dependency) {
+          if (!_.has(moduleStorage, dependency)) {
+              missedModule = dependency;
               return true;
           } else {
               return false;
           }
       });
+
       if (missingModule) {
           return missedModule;
       } else {
-          dependentContents = resolvedDependencies.map(function(value) {
-              if (_.has(configPath, value)) {
-                  if (configPath[value].indexOf('../') !== -1) {
-                      return moduleStorage[value].contents.toString();
-                  } else {
-                      return moduleStorage[value].contents.toString() + ';';
-                  }
+          dependentContents = _.map(resolvedDependencies, function(dependency) {
+              if (_.has(configPath, dependency) && configPath[dependency].indexOf('../') !== -1) {
+                  return moduleStorage[dependency].contents.toString();
               }
               else {
-                  return moduleStorage[value].contents.toString() + ';';
+                  return moduleStorage[dependency].contents.toString() + ';';
               }
           });
           dependentContents.push(targetFile.contents.toString() + ';');

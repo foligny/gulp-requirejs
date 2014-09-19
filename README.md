@@ -15,8 +15,9 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 + Regular maintain and version upgrade after the chinese National Day. 
 
 # Instruction
-+ All defined modules should in one particular directory like `./modules`, any other third-party modules,
-  libs, plugins outside the directory will just import their contents, without any processing.
++ All defined modules should in one particular directory like `./modules` (plugins or any other requirejs
+  specific modules included), any other libs with global variable outside the directory just import their
+  contents, without any processing.
 + When `opts.path` undeclared, all module name(auto added) and module dependent name should be relative 
   path **without dot, oblique at the beginning or extname at the end**. 
 + When `opts.path` declared, module name would be `path config` value, not original relative path. 
@@ -25,7 +26,7 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 # Feature
 + Support single requirejs file optimize. (Finished, maybe some bug not coveraged by UT)
 + Support multi requirejs file optimize. (Finished, maybe some bug not coverage by UT)
-+ Support specific config options `path`. (Half-Finished, maybe some bug not coverage by UT
++ Support specific config options `path`. (Finished, maybe some bug not coverage by UT
   the path maps modules in the specific directory, or others outside the directory)
 + Files outside the directory will import. Third-party `requirejs` specific module or libs like 
   `jquery` would import into the optimized file without processing.(Finished, maybe some bug 
@@ -34,7 +35,29 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
   error event doesn't emit anymore since v0.8.0, and optional import the plugin contents by `opts.plugin`. 
   Because of directly import, maybe you should add explicit plugin module name manually, any way, tough stuff. 
   (Pending).
++ Partial plugin support, when you have dependency like `define['html!template/main'],function(template){})`,
+  error event doesn't emit anymore since v0.8.5, and optional import the plugin contents by `opts.plugin`. 
+  any way, tough stuff(Finished).
++ Support recursive moduleDependency next version v0.9.0.
 
+lang.js
+```javascript
+define([],function(){});
+```
+logger.js
+```javascript
+define(['lang'],function(){});
+```
+optimize-info.js
+```javascript
+define(['logger'],function(logger){});
+```
+structure will get contents below after optimize
+```javascript
+define('lang',[],function (){});
+define('logger',['lang'],function (){});
+define('optimize-info',['logger'],function (logger){});
+```
 # options
 Four config options provided now.
 ```javascript
