@@ -1,1 +1,1 @@
-define('html',[],function(){});
+define(['text'],function (text){});
