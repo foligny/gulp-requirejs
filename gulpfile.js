@@ -86,3 +86,13 @@ gulp.task('example-plugin', function() {
           .pipe(gulp.dest('dist'));
 });
 
+gulp.task('example-recursive', function() {
+    return gulp.src(['./test/fixtures/*.js'])
+        .pipe(gulpRequirejs({
+            baseUrl: './test/fixtures',
+            module: 'optimize-recursive',
+            recursive: true
+        }))
+          .pipe(gulp.dest('dist'));
+});
+
