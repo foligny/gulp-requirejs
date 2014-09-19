@@ -33,7 +33,8 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 + Partial plugin support, when you have dependency like `define['html!template/main'],function(template){})`,
   error event doesn't emit anymore since v0.8.5, and optional import the plugin contents by `opts.plugin`. 
   any way, tough stuff(Finished).
-+ Support recursive moduleDependency next version v0.9.0(Develop).
++ Support recursive moduleDependency optimize, but the depth limited to 2. The dependencies of direct 
+  dependencies will be import, as belows.(Finished)
 
 lang.js
 ```javascript
