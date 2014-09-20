@@ -9,9 +9,8 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 
 # Warning
 + The project still in early state of development and far away from production environment.
-  welcome any pull request, I promise to lookup any modification, or just become collaborator through
-  send me an email hjj491229492@hotmail.com.
-+ Expected first release version before 2014/09/31.
+  welcome any pull request.
++ Expected initial production version before 2014/09/31.
 + Regular maintain and version upgrade after the chinese National Day. 
 
 # Instruction

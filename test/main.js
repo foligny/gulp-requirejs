@@ -30,17 +30,17 @@ describe('gulp-requirejs-errors', function () {
             });
     });
 
-it('should emit error when missing required modules', function (done) {
-     gulp.src('./test/fixtures/*.js')
-         .pipe(gulpRequirejs({
-             baseUrl: './test/fixtures',
-             module: 'optimize-error'
-         }))
-         .on('error', function(err) {
-             err.message.should.eql('Missing required modules ' + '["love"]' + ' in optimize-error');
-             done();
-         });
-});
+	it('should emit error when missing required modules', function (done) {
+	    gulp.src('./test/fixtures/*.js')
+	        .pipe(gulpRequirejs({
+	            baseUrl: './test/fixtures',
+	            module: 'optimize-error'
+	        }))
+	        .on('error', function(err) {
+	            err.message.should.eql('Missing required modules ' + '["love"]' + ' in optimize-error');
+	            done();
+	        });
+	});
 });
 
 describe('gulp-requirejs-optimize', function () {
