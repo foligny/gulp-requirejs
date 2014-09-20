@@ -64,7 +64,11 @@ module.exports = function(options) {
       optimizedArray = optimizedArray.concat(opts.module);
       _.each(optimizedArray, function(moduleName) {
           var file = parse.optimize(moduleStorage, moduleName, opts.path, opts.plugin, opts.recursive);
-          self.push(file);
+          if (file instanceof Error) {
+              self.emit('error', new PluginError(PLUGIN_NAME, 'Missing required modules ' + file.message + ' in ' + moduleName));
+          } else {
+              self.push(file);
+          }
       });
       callback();
   }

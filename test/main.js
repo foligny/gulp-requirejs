@@ -30,17 +30,17 @@ describe('gulp-requirejs-errors', function () {
             });
     });
 
-//it('should emit error when missing required modules', function (done) {
-//     gulp.src('./test/fixtures/*.js')
-//         .pipe(gulpRequirejs({
-//             baseUrl: './test/fixtures',
-//             module: 'optimize-error'
-//         }))
-//         .on('error', function(err) {
-//             err.message.should.eql('Missing required module love in optimize-error');
-//             done();
-//         });
-//});
+it('should emit error when missing required modules', function (done) {
+     gulp.src('./test/fixtures/*.js')
+         .pipe(gulpRequirejs({
+             baseUrl: './test/fixtures',
+             module: 'optimize-error'
+         }))
+         .on('error', function(err) {
+             err.message.should.eql('Missing required modules ' + '["love"]' + ' in optimize-error');
+             done();
+         });
+});
 });
 
 describe('gulp-requirejs-optimize', function () {
@@ -424,29 +424,35 @@ describe('parse module', function () {
     });
 
     it('should get empty module dependencies when undeclared', function () {
-        sample = new File({
-            path: "sample.js",
-            contents: new Buffer("define([], function(){return {};})")
-        });
-        result = parse.getModuleDependencies(sample);
+        var container = {
+            sample : new File({
+                path: "sample.js",
+                contents: new Buffer("define([], function(){return {};})")
+            })
+        };
+        result = parse.getModuleDependencies(container, container.sample, false);
         result.should.be.empty;
     });
 
     it('should get empty module dependencies when missing', function () {
-        sample = new File({
-            path: "sample.js",
-            contents: new Buffer("define(function(){return {};})")
-        });
-        result = parse.getModuleDependencies(sample);
+        var container = {
+            sample : new File({
+                path: "sample.js",
+                contents: new Buffer("define(function(){return {};})")
+            })
+        };
+        result = parse.getModuleDependencies(container, container.sample, false);
         result.should.be.empty;
     });
 
     it('should get proper module dependencies when declared', function () {
-        sample = new File({
-            path: "sample.js",
-            contents: new Buffer("define(['lang','logger'],function(lang,logger){})")
-        });
-        result = parse.getModuleDependencies(sample);
+        var container = {
+            sample : new File({
+                path: "sample.js",
+                contents: new Buffer("define(['lang','logger'],function(lang,logger){})")
+            })
+        };
+        result = parse.getModuleDependencies(container, container.sample, false);
         result.should.eql(['lang', 'logger']);
     });
 

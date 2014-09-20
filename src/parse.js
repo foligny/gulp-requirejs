@@ -74,10 +74,12 @@ parse = {
     /**
      * @description
      * To get proper module dependencies name.
+     * @param {object} container the container to reserve files
      * @param {string} file  the original file analyze get module dependencies
+     * @param {boolean} keepPlugin whether reserve plugins dependency
      * @returns {array} the module dependencies name from file contents, empty when undeclared
      */
-	getModuleDependencies: function(file) {
+	getModuleDependencies: function(container, file, keepPlugin) {
         var define = function(name, dependencies) {
             if (typeof name === 'string' && Object.prototype.toString.call(dependencies) === '[object Array]') {
                 return dependencies;
@@ -87,7 +89,11 @@ parse = {
                 return [];
             }
         };
-        return eval(file.contents.toString());
+
+        var moduleDependencies;
+        moduleDependencies = parse.resolvePluginDependencies(eval(file.contents.toString()), keepPlugin);
+        parse.missedModules = parse.checkDependencyMiss(container, moduleDependencies);
+        return moduleDependencies;
     },
 
     /**
@@ -99,17 +105,17 @@ parse = {
      * @returns {array} the resolved dependency array
      */
     getRecursiveModuleDependencies: function(container, file, keepPlugin) {
-        var initialDependency = parse.getModuleDependencies(file);
-        var pluginResolvedDependency = parse.resolvePluginDependencies(initialDependency, keepPlugin);
+        var pluginResolvedDependency = parse.getModuleDependencies(container, file, keepPlugin);
         var directProvisionDependencies = [];
         var recursiveProvisionDependencies = [];
         var finalDependencies = [];
         _.each(pluginResolvedDependency, function(dependency) {
             directProvisionDependencies.push(dependency);
-            recursiveProvisionDependencies = _.union(recursiveProvisionDependencies, parse.getModuleDependencies(container[dependency]));
+            recursiveProvisionDependencies = _.union(recursiveProvisionDependencies, parse.getModuleDependencies(container, container[dependency], keepPlugin));
         });
         finalDependencies = _.union(recursiveProvisionDependencies, directProvisionDependencies);
         finalDependencies = _.without(finalDependencies, 'module');
+        parse.missedModules = _.union(parse.missedModules, parse.checkDependencyMiss(container, finalDependencies));
         return finalDependencies;
     },
     /**
@@ -195,28 +201,34 @@ parse = {
      * @returns {string} the dependencies contents
      */
     optimize: function(container, moduleName, config, keepPlugin, recursive) {
-        var dependencies = [];
-        var dependenciesContents = '';
-        var configPath = _.extend({}, config);
-        if (!!recursive) {
-            dependencies = parse.getRecursiveModuleDependencies(container, container[moduleName], keepPlugin);
-        } else {
-            dependencies = parse.getModuleDependencies(container[moduleName]);
+        try {
+            var dependencies = [];
+            var dependenciesContents = '';
+            var configPath = _.extend({}, config);
+            if (!!recursive) {
+                dependencies = parse.getRecursiveModuleDependencies(container, container[moduleName], keepPlugin);
+            } else {
+                dependencies = parse.getModuleDependencies(container, container[moduleName], keepPlugin);
+            }
+            dependencies = parse.resolvePluginDependencies(dependencies, keepPlugin);
+            dependenciesContents = _.map(dependencies, function(dependency) {
+                if (_.has(configPath, dependency) && configPath[dependency].indexOf('../') !== -1) {
+                    return container[dependency].contents.toString();
+                }
+                else {
+                    return container[dependency].contents.toString() + ';';
+                }
+            });
+            dependenciesContents.push(container[moduleName].contents.toString() + ';');
+            return new File({
+                path: moduleName + '.js',
+                contents: new Buffer(dependenciesContents.join('\n'))
+            });
+        } catch (err) {
+            if (!_.isEmpty(parse.missedModules)) {
+                return new Error(JSON.stringify(parse.missedModules));
+            }
         }
-        dependencies = parse.resolvePluginDependencies(dependencies, keepPlugin);
-        dependenciesContents = _.map(dependencies, function(dependency) {
-            if (_.has(configPath, dependency) && configPath[dependency].indexOf('../') !== -1) {
-                return container[dependency].contents.toString();
-            }
-            else {
-                return container[dependency].contents.toString() + ';';
-            }
-        });
-        dependenciesContents.push(container[moduleName].contents.toString() + ';');
-        return new File({
-            path: moduleName + '.js',
-            contents: new Buffer(dependenciesContents.join('\n'))
-        });
     }
 };
 
