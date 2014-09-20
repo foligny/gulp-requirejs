@@ -59,96 +59,16 @@ module.exports = function(options) {
   }
 
   function flushBuffer(callback) {
-      var file;
       var optimizedArray = [];
       var self = this;
       optimizedArray = optimizedArray.concat(opts.module);
       _.each(optimizedArray, function(moduleName) {
-          file = optimize(moduleName);
-          if (typeof file === 'string') {
-              self.emit('error', new PluginError(PLUGIN_NAME, 'Missing required module ' + file + ' in ' + moduleName));
-          } else {
-              self.push(file);
-          }
+          var file = parse.optimize(moduleStorage, moduleName, opts.path, opts.plugin, opts.recursive);
+          self.push(file);
       });
       callback();
   }
 
-  function getFinalModuleDependencies(container, moduleName, recursive) {
-      var initialDependencies = parse.getModuleDependencies(container[moduleName].contents.toString());
-      var initialPluginResolvedDependencies =_.without(resolvePluginDependencies(initialDependencies), 'module');
-      try {
-          checkDependencyMiss(container, initialPluginResolvedDependencies);
-      } catch (err) {
-          throw err;
-      }
-
-      if (!recursive) {
-          return initialPluginResolvedDependencies;
-      }
-
-      var directProvisionDependencies = [];
-      var recursiveProvisionDependencies = [];
-      var finalDependencies = [];
-      _.each(initialPluginResolvedDependencies, function(dependency) {
-          recursiveProvisionDependencies = _.union(recursiveProvisionDependencies, parse.getModuleDependencies(container[dependency].contents.toString()));
-          directProvisionDependencies.push(dependency);
-      });
-      finalDependencies = _.union(recursiveProvisionDependencies, directProvisionDependencies);
-      finalDependencies = _.without(finalDependencies, 'module');
-      try {
-          checkDependencyMiss(container, finalDependencies);
-          return finalDependencies;
-      } catch (err) {
-          throw err;
-      }
-  }
-
-  function resolvePluginDependencies(initialDependencies) {
-      var resolvedResult = [];
-      _.each(initialDependencies, function(dependency) {
-          if (dependency.indexOf('!') === -1) {
-              resolvedResult.push(dependency);
-          }
-          if (dependency.indexOf('!') !== -1 && opts.plugin) {
-              resolvedResult.push(dependency.split('!')[0]);
-          }
-      });
-
-      return resolvedResult;
-  }
-  function checkDependencyMiss(container, dependencies) {
-      _.each(dependencies, function(dependency) {
-          if (!_.has(container, dependency)) {
-              throw new Error(dependency.toString());
-          }
-      });
-  }
-  function optimize(moduleName) {
-      // optimized module must be relative path, Maybe bug somewhere
-      var targetModuleName = normalizer.normalizeDependentRelative(fullBasePath, moduleName);
-      var configPath = opts.path;
-      var finalDependencies;
-      var finalDependentContents;
-      try {
-          finalDependencies = getFinalModuleDependencies(moduleStorage, targetModuleName, opts.recursive);
-          finalDependentContents = _.map(finalDependencies, function(dependency) {
-              if (_.has(configPath, dependency) && configPath[dependency].indexOf('../') !== -1) {
-                  return moduleStorage[dependency].contents.toString();
-              }
-              else {
-                  return moduleStorage[dependency].contents.toString() + ';';
-              }
-          });
-          finalDependentContents.push(moduleStorage[targetModuleName].contents.toString() + ';');
-          return new File({
-              path: targetModuleName + '.js',
-              contents: new Buffer(finalDependentContents.join('\n'))
-          });
-      } catch (err) {
-          return err.message;
-      }
-  }
   return through(transformBuffer, flushBuffer);
 };
 
