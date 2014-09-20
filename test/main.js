@@ -9,14 +9,14 @@ require('mocha');
 require('should');
 
 describe('gulp-requirejs-errors', function () {
- it('should throw when options is missing', function () {
+it('should throw when options is missing', function () {
      (function() {
          gulp.src(['./test/fixtures/lang.js']).pipe(gulpRequirejs());
      })
      .should.throw('Missing options for gulp-requirejs-optimizer');
- });
+});
 
- it('should emit error when streamed file', function (done) {
+it('should emit error when streamed file', function (done) {
      gulp.src(['./test/fixtures/lang.js'], {buffer: false})
          .pipe(gulpRequirejs({
              baseUrl: './test/fixture',
@@ -26,9 +26,9 @@ describe('gulp-requirejs-errors', function () {
              err.message.should.eql('Stream not supported');
              done();
          });
- });
+});
 
- it('should emit error when missing required modules', function (done) {
+it('should emit error when missing required modules', function (done) {
      gulp.src('./test/fixtures/*.js')
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -38,11 +38,11 @@ describe('gulp-requirejs-errors', function () {
              err.message.should.eql('Missing required module love in optimize-error');
              done();
          });
- });
+});
 });
 
 describe('gulp-requirejs-optimize', function () {
- it('should optimize single file without sub-directory', function(done) {
+it('should optimize single file without sub-directory', function(done) {
      gulp.src('./test/fixtures/*.js')
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -53,9 +53,9 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
- it('should optimize single file with sub-directory', function(done) {
+it('should optimize single file with sub-directory', function(done) {
      gulp.src('./test/fixtures/**/*.js')
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -66,9 +66,9 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
- it('should optimize file with path config', function(done) {
+it('should optimize file with path config', function(done) {
      gulp.src('./test/fixtures/**/*.js')
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -82,9 +82,9 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
- it('should optimize file with path config', function(done) {
+it('should optimize file with path config', function(done) {
      gulp.src(['./test/fixtures/**/*.js','./test/mockLibs/**/*.js'])
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -100,9 +100,9 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
- it('should optimize multiple file', function(done) {
+it('should optimize multiple file', function(done) {
      gulp.src('./test/fixtures/**/*.js')
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -117,9 +117,9 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
- it('should optimize file with requirejs plugins with import plugin contents', function(done) {
+it('should optimize file with requirejs plugins with import plugin contents', function(done) {
      gulp.src(['./test/fixtures/optimize-plugin.js','./test/fixtures/plugins/*.js'])
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -136,9 +136,9 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
- it('should optimize file with requirejs plugins without import plugin contents', function(done) {
+it('should optimize file with requirejs plugins without import plugin contents', function(done) {
      gulp.src(['./test/fixtures/optimize-plugin.js','./test/fixtures/plugins/*.js'])
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -155,9 +155,9 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
- it('should optimize file with requirejs plugins import plugin contents recursively', function(done) {
+it('should optimize file with requirejs plugins import plugin contents recursively', function(done) {
      gulp.src(['./test/fixtures/optimize-recursive-plugin.js','./test/fixtures/plugins/*.js'])
          .pipe(gulpRequirejs({
              baseUrl: './test/fixtures',
@@ -175,7 +175,7 @@ describe('gulp-requirejs-optimize', function () {
              (file.contents.toString().replace(/\s*/g, '')).should.eql(compare);
          }))
          .on('end', done);
- });
+});
 
   it('should optimize file without plugins recursively', function(done) {
       gulp.src(['./test/fixtures/*.js'])
@@ -226,10 +226,16 @@ describe('parse module', function () {
   });
 
   it('should set proper module name when pass-in', function () {
-      sample = "define(function(lang,logger){})";
-      result = parse.setModuleName(sample, 'example').replace(/\s*/g, "");
-      result.should.equal("define('example',function(lang,logger){})");
-  });
+        sample = "define(function(lang,logger){})";
+        result = parse.setModuleName(sample, 'example').replace(/\s*/g, "");
+        result.should.equal("define('example',function(lang,logger){})");
+    });
+
+    it('should set proper module name when pass-in', function () {
+        sample = 'define({"name" : "500 days with summer","type" : "comedy"})';
+        result = parse.setModuleName(sample, 'example').replace(/\s*/g, "");
+        result.should.equal("define('example'," + '{"name":"500 days with summer","type":"comedy"}'.replace(/\s*/g, "") + ')');
+    });
 
   it('should get empty module dependencies when undeclared', function () {
       sample = "define([], function(){return {};})";
@@ -269,7 +275,7 @@ describe('parse module', function () {
 });
 
 describe('normalize path module', function () {
- it('should normalize file path', function (done) {
+it('should normalize file path', function (done) {
      gulp.src(['./test/fixtures/lang.js'])
          .pipe(through(function(file, encoding, callback) {
              var basePath = './test';
@@ -279,9 +285,9 @@ describe('normalize path module', function () {
              callback();
              done();
          }));
- });
+});
 
- it('should normalize dependent path', function (done) {
+it('should normalize dependent path', function (done) {
      gulp.src(['./test/fixtures/lang.js'])
          .pipe(through(function(file, encoding, callback) {
              var basePath = './test';
@@ -292,5 +298,5 @@ describe('normalize path module', function () {
              callback();
              done();
          }));
- });
+});
 });

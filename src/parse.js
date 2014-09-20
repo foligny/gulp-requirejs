@@ -1,3 +1,4 @@
+var _ = require('underscore');
 module.exports = {
     /**
      * @description
@@ -27,10 +28,13 @@ module.exports = {
     setModuleName: function(fileContents, moduleName) {
         var define = function(name, dependencies) {
             var result = null;
-            var tmp = null;
-            if (typeof name === 'string') {
+            var structure = null;
+            if (_.isString(name)) {
                 result = fileContents;
-            } else if (Object.prototype.toString.call(name) === '[object Array]') {
+                return result;
+            }
+
+            if (_.isArray(name)) {
                 result = "define('" + moduleName.toString() + "',[";
                 name.forEach(function(value, key) {
                     if (key !== name.length-1) {
@@ -39,12 +43,25 @@ module.exports = {
                         result += "'" + value.toString() + "'";
                     }
                 });
-                tmp = typeof dependencies !== 'undefined' ? dependencies.toString() : '';
-                result +=  "]," + tmp + ")";
-            } else {
-                result = "define('" + moduleName.toString() + "'," + name.toString() + ")";
+
+                if (_.isFunction(dependencies)) {
+                    structure = dependencies.toString();
+                }
+                if (_.isObject(dependencies) && !_.isFunction(dependencies)) {
+                    structure = JSON.stringify(dependencies);
+                }
+
+                result +=  "]," + structure + ")";
+                return result;
             }
 
+            if (_.isFunction(name)) {
+                structure = name.toString();
+            }
+            if (_.isObject(name) && !_.isFunction(name)) {
+                structure = JSON.stringify(name);
+            }
+            result = "define('" + moduleName.toString() + "'," + structure + ")";
             return result;
         };
         return eval(fileContents);
