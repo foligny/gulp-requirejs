@@ -7,13 +7,8 @@ gulp-requirejs
 
 Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`. 
 
-# Warning
-+ The project still in early state of development and far away from production environment.
-  welcome any pull request.
-+ Expected initial production version before 2014/09/31.
-+ Regular maintain and version upgrade after the chinese National Day. 
-
 # Instruction
++ The project still in state of development, maybe not ready for production environment.
 + All defined modules should in one particular directory like `./modules` (plugins or any other requirejs
   specific modules included), any other libs with global variable outside the directory just import their
   contents, without any processing.
@@ -23,17 +18,15 @@ Custom migration to gulp-requirejs, inspired by `grunt-contrib-requirejs`.
 + Only optimize `define` module, non-support with `require`, which means error throw.
 
 # Feature
-+ Support single requirejs file optimize. (Finished, maybe some bug not coveraged by UT)
-+ Support multi requirejs file optimize. (Finished, maybe some bug not coverage by UT)
-+ Support specific config options `path`. (Finished, maybe some bug not coverage by UT
-  the path maps modules in the specific directory, or others outside the directory)
-+ Files outside the directory will import. Third-party libs like `jquery` would import into the optimized
-  file without processing.(Finished, maybe some bug not coverage by UT)
-+ Partial plugin support, when you have dependency like `define['html!template/main'],function(template){})`,
-  error event doesn't emit anymore since v0.8.5, and optional import the plugin contents by `opts.plugin`. 
-  any way, tough stuff(Finished).
++ Support single requirejs file optimize.
++ Support multi requirejs file optimize. 
++ Support specific config options `path`.(the path maps modules in the specific directory and libs outside
+  the specific directory).
++ Files outside the directory would import into the final optimized file without processing. 
++ Partial plugin support. Dependency like `define['html!template/main'],function(template){})` doesn't 
+  emit error event anymore since v0.8.5, and optional import the plugin contents by `opts.plugin`. 
 + Support recursive moduleDependency optimize, but the depth limited to 2. The dependencies of direct 
-  dependencies will be import, as belows.(Finished)
+  dependencies will import.
 
 # options
 Config options below provided now.
@@ -58,12 +51,27 @@ Config options below provided now.
 ```
 
 # Progress
-+ Till now, it just support single file optimize with `define` style, just execute `gulp example-basic`
-  or `gulp example-sub` to see the effect. javascript files in sub-directory of baseUrl accepted.
++ Support single file optimize with `define` style, just execute `gulp example-basic` or 
+  `gulp example-sub` to see the effect. javascript files in sub-directory of baseUrl accepted.
 
-+ In the `example-basic`, you have three modules in the `baseUrl` directory as below:
++ Support multiple file optimize with `define` style, just execute `gulp example-multi`
+  to see the effect. You will get `dist/optimize-info.js`, `dist/optimize-sub.js`.
 
-lang.js
++ Support path config file optimize in the specific directory with `define` style, just 
+  execute `gulp example-path` to see the effect. You will get `dist/optimize-path.js`.
+
++ Support path config file optimize outside the specific directory, just execute 
+  `gulp example-path` to see the effect. You will get `dist/optimize-outside.js`.
+
++ Support file optimize with dependency on plugins, just execute `gulp example-plugin` 
+  to see the effect. You will get `dist/optimize-plugin.js`.
+
++ Support file optimize recursively, just execute `gulp example-recursive` to see the
+  effect. You will get `dist/optimize-plugin.js`.
+
+# Annotation
+`example-basic`, you have modules in the `baseUrl` directory as below:
+
 ```javascript
 define([],function(){});
 ```
@@ -83,22 +91,7 @@ define('logger',[],function (){});
 define('optimize-info',['lang','logger'],function (lang,logger){});
 ```
 
-+ Support multiple file optimize with `define` style, just execute `gulp example-multi`
-  to see the effect. You will get `dist/optimize-info.js`, `dist/optimize-sub.js`.
-
-+ Support path config file optimize in the specific directory with `define` style, just 
-  execute `gulp example-path` to see the effect. You will get `dist/optimize-path.js`.
-
-+ Support path config file optimize outside the specific directory, just execute 
-  `gulp example-path` to see the effect. You will get `dist/optimize-outside.js`.
-
-+ Support file optimize with dependency on plugins, just execute `gulp example-plugin` 
-  to see the effect. You will get `dist/optimize-plugin.js`.
-
-+ Support file optimize recursively, just execute `gulp example-recursive` to see the
-  effect. You will get `dist/optimize-plugin.js`.
-
-For example:
+`example-recursive`, you have modules in the `baseUrl` directory as below:
 lang.js
 ```javascript
 define([],function(){});
