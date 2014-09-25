@@ -67,11 +67,12 @@ Config options below provided now.
   to see the effect. You will get `dist/optimize-plugin.js`.
 
 + Support file optimize recursively, just execute `gulp example-recursive` to see the
-  effect. You will get `dist/optimize-plugin.js`.
+  effect. You will get `dist/optimize-recursive.js`.
 
 # Annotation
 `example-basic`, you have modules in the `baseUrl` directory as below:
 
+lang.js
 ```javascript
 define([],function(){});
 ```
@@ -92,6 +93,7 @@ define('optimize-info',['lang','logger'],function (lang,logger){});
 ```
 
 `example-recursive`, you have modules in the `baseUrl` directory as below:
+
 lang.js
 ```javascript
 define([],function(){});
